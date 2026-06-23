@@ -56,4 +56,4 @@ Use `ui-concepts/index.html`, Concept B / Halo Pop, as the visual reference:
 
 - Apple Developer signing/team selection remains owner-managed.
 - Final App Store Connect app record, archive upload, and submission remain owner-managed.
-- GitHub Pages may need a minute after the first workflow run before the public URLs are live.
+- GitHub Pages workflow has completed successfully. If `github.io` access fails locally, recheck from a normal browser/network after propagation.

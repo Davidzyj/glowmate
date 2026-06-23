@@ -118,3 +118,6 @@ Acceptance:
 - `scripts/capture-screenshots.sh`: passed.
 - Real simulator screenshots generated at `screenshots/iphone-6.5/en/`.
 - Visual contact sheet reviewed at `build/screenshot-contact-sheet.png`; screens are rendered, readable, and Settings does not expose URL/email text.
+- GitHub repository created and pushed: `https://github.com/Davidzyj/glowmate`.
+- GitHub Pages enabled with workflow publishing; workflow completed successfully. Pages URL: `https://davidzyj.github.io/glowmate/`.
+- Local `curl` access to `github.io` from this machine was reset by the network, so public page reachability should be rechecked from a normal browser/network after DNS/cache propagation.
