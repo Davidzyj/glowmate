@@ -1,0 +1,2 @@
+"CFBundleDisplayName" = "GlowMate";
+"NSCameraUsageDescription" = "GlowMate uses the camera preview to estimate lighting locally and recommend screen fill light settings.";

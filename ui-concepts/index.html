@@ -1,0 +1,1387 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>补光工具 App UI Concepts</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17202a;
+      --muted: #69717f;
+      --line: rgba(23, 32, 42, 0.12);
+      --paper: #f6f7f4;
+      --phone-w: 302px;
+      --phone-h: 628px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f2f3ef;
+      color: var(--ink);
+    }
+
+    .page {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .intro {
+      padding: 42px 5vw 28px;
+      background: #fffdf6;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .intro h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .intro p {
+      max-width: 820px;
+      margin: 12px 0 0;
+      color: #4f5964;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .concept {
+      padding: 42px 5vw 52px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .concept-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    .concept-kicker {
+      margin: 0 0 8px;
+      color: #6a7280;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .concept h2 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .concept-desc {
+      max-width: 520px;
+      margin: 0;
+      color: #556070;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .phones {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(260px, var(--phone-w)));
+      gap: 24px;
+      align-items: start;
+      justify-content: center;
+    }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      border-radius: 42px;
+      padding: 13px;
+      background: #111;
+      box-shadow: 0 24px 80px rgba(20, 22, 25, 0.22);
+      position: relative;
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 88px;
+      height: 25px;
+      transform: translateX(-50%);
+      border-radius: 0 0 18px 18px;
+      background: #111;
+      z-index: 5;
+    }
+
+    .screen {
+      position: relative;
+      height: 100%;
+      border-radius: 32px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .status {
+      height: 36px;
+      padding: 10px 18px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: inherit;
+      position: relative;
+      z-index: 4;
+    }
+
+    .dynamic {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .tabbar {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 12px;
+      min-height: 58px;
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      z-index: 6;
+    }
+
+    .tab {
+      display: grid;
+      place-items: center;
+      gap: 4px;
+      color: inherit;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .tab svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .metric {
+      min-height: 66px;
+      border-radius: 16px;
+      padding: 10px;
+    }
+
+    .metric span {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: inherit;
+      opacity: 0.68;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 7px;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .camera-window {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 49% 39%, rgba(255, 228, 192, 0.72) 0 12%, transparent 13%),
+        radial-gradient(circle at 50% 57%, rgba(255, 211, 175, 0.75) 0 14%, transparent 15%),
+        linear-gradient(135deg, #323c42, #13171b 62%, #806545);
+    }
+
+    .face-outline {
+      position: absolute;
+      left: 50%;
+      top: 37%;
+      width: 94px;
+      height: 122px;
+      transform: translate(-50%, -50%);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 48% 48% 45% 45%;
+      box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.12);
+    }
+
+    .focus-box {
+      position: absolute;
+      left: 50%;
+      top: 43%;
+      width: 168px;
+      height: 220px;
+      transform: translate(-50%, -50%);
+      border: 1.5px solid rgba(255, 255, 255, 0.8);
+      border-radius: 22px;
+    }
+
+    .focus-box::before,
+    .focus-box::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 24px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .focus-box::before {
+      left: -12px;
+    }
+
+    .focus-box::after {
+      right: -12px;
+    }
+
+    .sheet {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 84px;
+      border-radius: 24px;
+      padding: 16px;
+      z-index: 4;
+    }
+
+    .title-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .title-line h3 {
+      margin: 0;
+      font-size: 19px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .caption {
+      margin: 8px 0 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: inherit;
+      opacity: 0.74;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .slider {
+      height: 36px;
+      border-radius: 999px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 68%;
+      border-radius: inherit;
+    }
+
+    .knob {
+      position: absolute;
+      top: 50%;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .swatches {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.82);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .list-row {
+      min-height: 56px;
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .list-row strong {
+      font-size: 14px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .list-row span {
+      display: block;
+      margin-top: 3px;
+      font-size: 11px;
+      opacity: 0.72;
+    }
+
+    .icon-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .icon-circle svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .small-text {
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .home-indicator {
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      width: 112px;
+      height: 4px;
+      transform: translateX(-50%);
+      border-radius: 99px;
+      z-index: 9;
+    }
+
+    /* Concept A: Luma Guide */
+    .concept-a {
+      background: #eef2ed;
+    }
+
+    .a-screen {
+      background: #f8faf5;
+      color: #172322;
+    }
+
+    .a-top {
+      padding: 12px 18px 0;
+    }
+
+    .a-app-title {
+      margin: 10px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .a-app-title h3 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .a-score {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #072c28;
+      background: conic-gradient(#1cb69d 0 68%, #dbe6dc 68% 100%);
+      box-shadow: inset 0 0 0 8px #eef7ef;
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .a-camera {
+      height: 250px;
+      margin: 18px 14px 0;
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(29, 43, 39, 0.18);
+    }
+
+    .a-chip {
+      background: rgba(255, 255, 255, 0.86);
+      color: #12322f;
+      border: 1px solid rgba(18, 50, 47, 0.1);
+      position: absolute;
+      top: 14px;
+      left: 14px;
+    }
+
+    .a-sheet {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(29, 43, 39, 0.08);
+      box-shadow: 0 16px 36px rgba(29, 43, 39, 0.12);
+    }
+
+    .a-recommend {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .a-rec-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 38px;
+      border-radius: 14px;
+      padding: 0 12px;
+      background: #eef6ef;
+      color: #193a35;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .a-button {
+      margin-top: 14px;
+      width: 100%;
+      background: #102f2b;
+      color: #ffffff;
+    }
+
+    .a-tabbar {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(29, 43, 39, 0.08);
+      color: #50615d;
+      box-shadow: 0 12px 28px rgba(29, 43, 39, 0.12);
+    }
+
+    .a-tabbar .active {
+      color: #0f8f7e;
+    }
+
+    .a-home {
+      background: #172322;
+    }
+
+    .a-card {
+      margin: 16px 14px 0;
+      border-radius: 24px;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid rgba(29, 43, 39, 0.08);
+      box-shadow: 0 12px 30px rgba(29, 43, 39, 0.08);
+    }
+
+    .a-section-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: #183530;
+    }
+
+    .a-metric {
+      background: #f0f5ef;
+      color: #16342f;
+    }
+
+    .a-slider {
+      margin-top: 16px;
+      background: #e3ebe5;
+    }
+
+    .a-slider::before {
+      background: linear-gradient(90deg, #f7dca9, #35bfa9);
+    }
+
+    .a-knob {
+      left: 64%;
+      background: #ffffff;
+      border: 3px solid #158f7f;
+    }
+
+    .a-swatch-one { background: #fff0cf; }
+    .a-swatch-two { background: #fffaf0; }
+    .a-swatch-three { background: #eaf8ff; }
+    .a-swatch-four { background: #ffd6d0; }
+
+    .a-list-row {
+      background: #ffffff;
+      border: 1px solid rgba(29, 43, 39, 0.08);
+      color: #1b2b28;
+    }
+
+    .a-icon {
+      background: #edf7f1;
+      color: #118876;
+    }
+
+    /* Concept B: Halo Pop */
+    .concept-b {
+      background: #fff3ef;
+    }
+
+    .b-screen {
+      background:
+        radial-gradient(circle at 20% 6%, rgba(255, 172, 132, 0.42), transparent 30%),
+        radial-gradient(circle at 88% 3%, rgba(255, 214, 98, 0.4), transparent 28%),
+        #fff9f2;
+      color: #2d1d19;
+    }
+
+    .b-header {
+      padding: 14px 18px 0;
+    }
+
+    .b-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .b-logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #ff775f, #ffd064);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(255, 119, 95, 0.28);
+    }
+
+    .b-logo h3 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .b-logo p {
+      margin: 3px 0 0;
+      color: #8b5b4c;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .b-camera {
+      height: 286px;
+      margin: 18px 14px 0;
+      border-radius: 34px;
+      box-shadow: 0 18px 44px rgba(174, 77, 49, 0.22);
+    }
+
+    .b-ring {
+      position: absolute;
+      inset: 13px;
+      border-radius: 28px;
+      box-shadow:
+        inset 0 0 0 20px rgba(255, 246, 224, 0.9),
+        inset 0 0 40px rgba(255, 189, 120, 0.45);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .b-chip {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      background: rgba(255, 248, 235, 0.94);
+      color: #6c3a2a;
+      border: 1px solid rgba(108, 58, 42, 0.12);
+      z-index: 3;
+    }
+
+    .b-panel {
+      margin: 16px 14px 0;
+      border-radius: 28px;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid rgba(115, 55, 34, 0.08);
+      box-shadow: 0 16px 36px rgba(174, 77, 49, 0.13);
+    }
+
+    .b-panel h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.1;
+    }
+
+    .b-panel p {
+      margin: 6px 0 0;
+      color: #8d6151;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .b-button {
+      margin-top: 14px;
+      width: 100%;
+      color: #ffffff;
+      background: linear-gradient(135deg, #ff715d, #ffb943);
+      box-shadow: 0 12px 24px rgba(255, 113, 93, 0.25);
+    }
+
+    .b-tabbar {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(115, 55, 34, 0.08);
+      color: #9a695a;
+      box-shadow: 0 12px 28px rgba(174, 77, 49, 0.14);
+    }
+
+    .b-tabbar .active {
+      color: #ff6653;
+    }
+
+    .b-home {
+      background: #3b2520;
+    }
+
+    .b-swatches {
+      margin-top: 12px;
+    }
+
+    .b-swatch-one { background: #fff4d8; }
+    .b-swatch-two { background: #ffe1d3; }
+    .b-swatch-three { background: #ffccb9; }
+    .b-swatch-four { background: #fdf9ff; }
+
+    .b-slider {
+      margin-top: 14px;
+      background: #f6e0d7;
+    }
+
+    .b-slider::before {
+      background: linear-gradient(90deg, #ffb8a7, #ff795e);
+      width: 76%;
+    }
+
+    .b-knob {
+      left: 72%;
+      background: #ffffff;
+      border: 3px solid #ff705a;
+    }
+
+    .b-metric {
+      background: #fff5ed;
+      color: #563629;
+    }
+
+    .b-list-row {
+      background: #ffffff;
+      border: 1px solid rgba(115, 55, 34, 0.08);
+      color: #3b2720;
+    }
+
+    .b-icon {
+      background: #fff1e7;
+      color: #ff6e58;
+    }
+
+    .b-preview-band {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .b-before,
+    .b-after {
+      height: 136px;
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .b-before {
+      background: linear-gradient(135deg, #2d3035, #594637);
+    }
+
+    .b-after {
+      background: linear-gradient(135deg, #7e6a54, #ffd29a);
+    }
+
+    .b-before span,
+    .b-after span {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.32);
+    }
+
+    /* Concept C: Meter Deck */
+    .concept-c {
+      background: #edf4f8;
+    }
+
+    .c-screen {
+      background: #f7fbff;
+      color: #14202f;
+    }
+
+    .c-top {
+      padding: 14px 16px 0;
+    }
+
+    .c-title {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .c-title h3 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .c-badge {
+      height: 36px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 12px;
+      background: #14202f;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .c-camera {
+      height: 206px;
+      margin: 16px 12px 0;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(38, 72, 94, 0.18);
+    }
+
+    .histogram {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      height: 54px;
+      display: flex;
+      align-items: end;
+      gap: 3px;
+      padding: 8px;
+      border-radius: 12px;
+      background: rgba(13, 22, 33, 0.54);
+      z-index: 2;
+    }
+
+    .bar {
+      flex: 1;
+      border-radius: 3px 3px 0 0;
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .c-card {
+      margin: 12px 12px 0;
+      border-radius: 18px;
+      padding: 14px;
+      background: #ffffff;
+      border: 1px solid rgba(20, 32, 47, 0.1);
+      box-shadow: 0 12px 26px rgba(38, 72, 94, 0.1);
+    }
+
+    .c-card h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .c-meter {
+      height: 98px;
+      display: grid;
+      grid-template-columns: 102px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .dial {
+      width: 94px;
+      height: 94px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, #fff 0 45%, transparent 46%),
+        conic-gradient(#2f7cff 0 34%, #25c4a3 34% 68%, #ffb020 68% 100%);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: #14202f;
+    }
+
+    .c-meter-copy strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .c-meter-copy span {
+      display: block;
+      margin-top: 7px;
+      color: #647183;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .c-button {
+      width: 100%;
+      margin-top: 12px;
+      color: #ffffff;
+      background: #1b66f2;
+    }
+
+    .c-tabbar {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(20, 32, 47, 0.1);
+      color: #687588;
+      box-shadow: 0 12px 28px rgba(38, 72, 94, 0.13);
+    }
+
+    .c-tabbar .active {
+      color: #1b66f2;
+    }
+
+    .c-home {
+      background: #14202f;
+    }
+
+    .c-metric {
+      background: #edf4ff;
+      color: #17253a;
+    }
+
+    .c-slider {
+      margin-top: 14px;
+      background: #e2e9f2;
+    }
+
+    .c-slider::before {
+      background: linear-gradient(90deg, #2f7cff, #25c4a3);
+      width: 58%;
+    }
+
+    .c-knob {
+      left: 54%;
+      background: #ffffff;
+      border: 3px solid #236ff5;
+    }
+
+    .c-swatch-one { background: #fff0ca; }
+    .c-swatch-two { background: #fffdf3; }
+    .c-swatch-three { background: #e9f7ff; }
+    .c-swatch-four { background: #ffe0d8; }
+
+    .c-list-row {
+      background: #ffffff;
+      border: 1px solid rgba(20, 32, 47, 0.1);
+      color: #14202f;
+    }
+
+    .c-icon {
+      background: #eef5ff;
+      color: #1b66f2;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .tile {
+      min-height: 98px;
+      border-radius: 16px;
+      padding: 12px;
+      background: #f0f6ff;
+      color: #182739;
+    }
+
+    .tile strong {
+      display: block;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .tile span {
+      display: block;
+      margin-top: 8px;
+      color: #687588;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 980px) {
+      .concept-header {
+        display: block;
+      }
+
+      .concept-desc {
+        margin-top: 10px;
+      }
+
+      .phones {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro">
+      <h1>离线拍照补光工具 · 三套 UI 概念</h1>
+      <p>产品核心是拍前测光、给出补光建议，并直接用屏幕或手电筒完成补光。下面三套都按 iPhone 原生 App 的真实信息架构构思：测光首页、补光控制、场景/记录闭环。</p>
+    </section>
+
+    <section class="concept concept-a" id="concept-a">
+      <div class="concept-header">
+        <div>
+          <p class="concept-kicker">Concept A</p>
+          <h2>Luma Guide · 清爽专业型</h2>
+        </div>
+        <p class="concept-desc">偏 Apple 原生工具感，浅色、安静、可信。适合强调隐私、离线、专业但不吓人的测光补光助手。</p>
+      </div>
+      <div class="phones">
+        <article class="phone">
+          <div class="screen a-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="a-top">
+              <div class="a-app-title">
+                <h3>光补<br>指南</h3>
+                <div class="a-score">68</div>
+              </div>
+            </div>
+            <div class="camera-window a-camera">
+              <div class="focus-box"></div>
+              <div class="face-outline"></div>
+              <div class="pill a-chip">脸部偏暗</div>
+            </div>
+            <div class="sheet a-sheet">
+              <div class="title-line">
+                <h3>建议补光</h3>
+                <span class="small-text">暖白 65%</span>
+              </div>
+              <p class="caption">屏幕靠近脸部 30 cm，手机略高于眼睛。当前环境偏冷，暖白更自然。</p>
+              <div class="a-recommend">
+                <div class="a-rec-line"><span>屏幕亮度</span><strong>65%</strong></div>
+                <div class="a-rec-line"><span>色温方向</span><strong>暖白</strong></div>
+              </div>
+              <a class="button a-button">开启补光</a>
+            </div>
+            <nav class="tabbar a-tabbar">
+              <div class="tab active">⌁<span>测光</span></div>
+              <div class="tab">◐<span>补光</span></div>
+              <div class="tab">▦<span>场景</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator a-home"></div>
+          </div>
+        </article>
+
+        <article class="phone">
+          <div class="screen a-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="a-top">
+              <div class="a-app-title">
+                <h3>屏幕<br>柔光</h3>
+                <span class="pill" style="background:#e9f6ef;color:#0e7f70;">自拍模式</span>
+              </div>
+            </div>
+            <div class="a-card">
+              <h3 class="a-section-title">补光强度</h3>
+              <div class="slider a-slider"><div class="knob a-knob"></div></div>
+              <div class="metric-row" style="margin-top:14px;">
+                <div class="metric a-metric"><span>亮度</span><strong>65%</strong></div>
+                <div class="metric a-metric"><span>色温</span><strong>暖白</strong></div>
+                <div class="metric a-metric"><span>距离</span><strong>30cm</strong></div>
+              </div>
+            </div>
+            <div class="a-card">
+              <h3 class="a-section-title">柔光颜色</h3>
+              <div class="swatches">
+                <div class="swatch a-swatch-one"></div>
+                <div class="swatch a-swatch-two"></div>
+                <div class="swatch a-swatch-three"></div>
+                <div class="swatch a-swatch-four"></div>
+              </div>
+            </div>
+            <div class="a-card">
+              <h3 class="a-section-title">当前闭环</h3>
+              <p class="caption" style="opacity:.78;">上次使用：自拍模式 · 暖白 65%。返回测光页会显示已应用状态。</p>
+            </div>
+            <nav class="tabbar a-tabbar">
+              <div class="tab">⌁<span>测光</span></div>
+              <div class="tab active">◐<span>补光</span></div>
+              <div class="tab">▦<span>场景</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator a-home"></div>
+          </div>
+        </article>
+
+        <article class="phone">
+          <div class="screen a-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="a-top">
+              <div class="a-app-title">
+                <h3>拍摄<br>场景</h3>
+                <span class="pill" style="background:#102f2b;color:#fff;">已保存</span>
+              </div>
+            </div>
+            <div class="list" style="margin:18px 14px 0;">
+              <div class="list-row a-list-row">
+                <div><strong>自拍头像</strong><span>脸部优先 · 暖白 65%</span></div>
+                <div class="icon-circle a-icon">✓</div>
+              </div>
+              <div class="list-row a-list-row">
+                <div><strong>餐厅食物</strong><span>去黄光 · 自然白 72%</span></div>
+                <div class="icon-circle a-icon">○</div>
+              </div>
+              <div class="list-row a-list-row">
+                <div><strong>商品照片</strong><span>阴影提醒 · 冷白 80%</span></div>
+                <div class="icon-circle a-icon">○</div>
+              </div>
+              <div class="list-row a-list-row">
+                <div><strong>视频会议</strong><span>屏幕常亮 · 自然白 55%</span></div>
+                <div class="icon-circle a-icon">○</div>
+              </div>
+            </div>
+            <div class="a-card">
+              <h3 class="a-section-title">本地记录</h3>
+              <p class="caption">保存最近 10 次推荐参数，全部仅保存在设备本地。</p>
+            </div>
+            <nav class="tabbar a-tabbar">
+              <div class="tab">⌁<span>测光</span></div>
+              <div class="tab">◐<span>补光</span></div>
+              <div class="tab active">▦<span>场景</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator a-home"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="concept concept-b" id="concept-b">
+      <div class="concept-header">
+        <div>
+          <p class="concept-kicker">Concept B</p>
+          <h2>Halo Pop · 自拍创作者型</h2>
+        </div>
+        <p class="concept-desc">更亲和、更有分享感，强调屏幕柔光、肤色、前后对比。适合自拍、短视频、头像、社交平台用户。</p>
+      </div>
+      <div class="phones">
+        <article class="phone">
+          <div class="screen b-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="b-header">
+              <div class="b-logo">
+                <div class="b-logo-mark">✦</div>
+                <div>
+                  <h3>GlowMate</h3>
+                  <p>离线柔光助手</p>
+                </div>
+              </div>
+            </div>
+            <div class="camera-window b-camera">
+              <div class="b-ring"></div>
+              <div class="face-outline"></div>
+              <div class="pill b-chip">肤色偏冷 · 建议暖肤光</div>
+            </div>
+            <div class="b-panel">
+              <h3>让脸亮一点，不要闪得硬</h3>
+              <p>推荐暖肤光 72%，适合车内、酒店、夜晚房间自拍。</p>
+              <a class="button b-button">开始柔光自拍</a>
+            </div>
+            <nav class="tabbar b-tabbar">
+              <div class="tab active">✦<span>自拍</span></div>
+              <div class="tab">◉<span>灯光</span></div>
+              <div class="tab">▧<span>对比</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator b-home"></div>
+          </div>
+        </article>
+
+        <article class="phone">
+          <div class="screen b-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="b-header">
+              <div class="b-logo">
+                <div class="b-logo-mark">◉</div>
+                <div>
+                  <h3>柔光灯</h3>
+                  <p>已应用到自拍模式</p>
+                </div>
+              </div>
+            </div>
+            <div class="b-panel">
+              <h3>暖肤光</h3>
+              <p>屏幕亮度 72%，拍照时保持常亮。</p>
+              <div class="slider b-slider"><div class="knob b-knob"></div></div>
+              <div class="swatches b-swatches">
+                <div class="swatch b-swatch-one"></div>
+                <div class="swatch b-swatch-two"></div>
+                <div class="swatch b-swatch-three"></div>
+                <div class="swatch b-swatch-four"></div>
+              </div>
+              <div class="metric-row" style="margin-top:14px;">
+                <div class="metric b-metric"><span>柔光</span><strong>72%</strong></div>
+                <div class="metric b-metric"><span>肤色</span><strong>暖</strong></div>
+                <div class="metric b-metric"><span>阴影</span><strong>低</strong></div>
+              </div>
+            </div>
+            <div class="b-panel">
+              <h3>灯光形状</h3>
+              <p>环形补光适合眼神光；侧光适合立体头像。</p>
+            </div>
+            <nav class="tabbar b-tabbar">
+              <div class="tab">✦<span>自拍</span></div>
+              <div class="tab active">◉<span>灯光</span></div>
+              <div class="tab">▧<span>对比</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator b-home"></div>
+          </div>
+        </article>
+
+        <article class="phone">
+          <div class="screen b-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="b-header">
+              <div class="b-logo">
+                <div class="b-logo-mark">▧</div>
+                <div>
+                  <h3>效果对比</h3>
+                  <p>拍前建议已保存</p>
+                </div>
+              </div>
+            </div>
+            <div class="b-panel">
+              <h3>今天的推荐</h3>
+              <p>暖肤光 72%，屏幕离脸 25-35 cm。</p>
+              <div class="b-preview-band">
+                <div class="b-before"><span>原始光线</span></div>
+                <div class="b-after"><span>补光后</span></div>
+              </div>
+            </div>
+            <div class="list" style="margin:14px;">
+              <div class="list-row b-list-row">
+                <div><strong>夜晚房间</strong><span>暖肤光 · 72%</span></div>
+                <div class="icon-circle b-icon">✓</div>
+              </div>
+              <div class="list-row b-list-row">
+                <div><strong>车内自拍</strong><span>自然白 · 82%</span></div>
+                <div class="icon-circle b-icon">○</div>
+              </div>
+            </div>
+            <nav class="tabbar b-tabbar">
+              <div class="tab">✦<span>自拍</span></div>
+              <div class="tab">◉<span>灯光</span></div>
+              <div class="tab active">▧<span>对比</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator b-home"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="concept concept-c" id="concept-c">
+      <div class="concept-header">
+        <div>
+          <p class="concept-kicker">Concept C</p>
+          <h2>Meter Deck · 高效仪表盘型</h2>
+        </div>
+        <p class="concept-desc">更像摄影工具，参数密度更高，有 EV、直方图、曝光安全提示。适合胶片玩家、商品拍摄、小商家和工具付费用户。</p>
+      </div>
+      <div class="phones">
+        <article class="phone">
+          <div class="screen c-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="c-top">
+              <div class="c-title">
+                <h3>Meter<br>Deck</h3>
+                <span class="c-badge">EV 6.8</span>
+              </div>
+            </div>
+            <div class="camera-window c-camera">
+              <div class="focus-box"></div>
+              <div class="histogram">
+                <div class="bar" style="height:18%;"></div>
+                <div class="bar" style="height:28%;"></div>
+                <div class="bar" style="height:34%;"></div>
+                <div class="bar" style="height:48%;"></div>
+                <div class="bar" style="height:76%;"></div>
+                <div class="bar" style="height:68%;"></div>
+                <div class="bar" style="height:44%;"></div>
+                <div class="bar" style="height:30%;"></div>
+                <div class="bar" style="height:22%;"></div>
+              </div>
+            </div>
+            <div class="c-card">
+              <h3>补光建议</h3>
+              <div class="c-meter">
+                <div class="dial">58%</div>
+                <div class="c-meter-copy">
+                  <strong>自然白补光</strong>
+                  <span>阴影偏重，建议从左前方补光。高光安全。</span>
+                </div>
+              </div>
+              <a class="button c-button">应用参数</a>
+            </div>
+            <nav class="tabbar c-tabbar">
+              <div class="tab active">▣<span>测光</span></div>
+              <div class="tab">◒<span>控制</span></div>
+              <div class="tab">▥<span>记录</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator c-home"></div>
+          </div>
+        </article>
+
+        <article class="phone">
+          <div class="screen c-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="c-top">
+              <div class="c-title">
+                <h3>灯光<br>控制</h3>
+                <span class="c-badge">保存中</span>
+              </div>
+            </div>
+            <div class="c-card">
+              <h3>屏幕补光</h3>
+              <div class="slider c-slider"><div class="knob c-knob"></div></div>
+              <div class="grid-two">
+                <div class="tile"><strong>58%</strong><span>屏幕亮度</span></div>
+                <div class="tile"><strong>4700K</strong><span>自然白参考</span></div>
+              </div>
+            </div>
+            <div class="c-card">
+              <h3>颜色</h3>
+              <div class="swatches">
+                <div class="swatch c-swatch-one"></div>
+                <div class="swatch c-swatch-two"></div>
+                <div class="swatch c-swatch-three"></div>
+                <div class="swatch c-swatch-four"></div>
+              </div>
+              <div class="metric-row" style="margin-top:14px;">
+                <div class="metric c-metric"><span>ISO</span><strong>640</strong></div>
+                <div class="metric c-metric"><span>快门</span><strong>1/40</strong></div>
+                <div class="metric c-metric"><span>偏移</span><strong>-0.3</strong></div>
+              </div>
+            </div>
+            <nav class="tabbar c-tabbar">
+              <div class="tab">▣<span>测光</span></div>
+              <div class="tab active">◒<span>控制</span></div>
+              <div class="tab">▥<span>记录</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator c-home"></div>
+          </div>
+        </article>
+
+        <article class="phone">
+          <div class="screen c-screen">
+            <div class="status"><span>9:41</span><span class="dynamic">5G ▰</span></div>
+            <div class="c-top">
+              <div class="c-title">
+                <h3>本地<br>记录</h3>
+                <span class="c-badge">离线</span>
+              </div>
+            </div>
+            <div class="list" style="margin:16px 12px 0;">
+              <div class="list-row c-list-row">
+                <div><strong>商品白底图</strong><span>EV 7.2 · 自然白 64%</span></div>
+                <div class="icon-circle c-icon">↗</div>
+              </div>
+              <div class="list-row c-list-row">
+                <div><strong>餐厅桌面</strong><span>EV 5.9 · 去黄 70%</span></div>
+                <div class="icon-circle c-icon">↗</div>
+              </div>
+              <div class="list-row c-list-row">
+                <div><strong>视频会议</strong><span>EV 6.5 · 常亮 52%</span></div>
+                <div class="icon-circle c-icon">↗</div>
+              </div>
+            </div>
+            <div class="c-card">
+              <h3>验收闭环</h3>
+              <p class="caption">选择记录后回到控制页，亮度、色温、场景标签全部恢复，并显示已应用反馈。</p>
+            </div>
+            <nav class="tabbar c-tabbar">
+              <div class="tab">▣<span>测光</span></div>
+              <div class="tab">◒<span>控制</span></div>
+              <div class="tab active">▥<span>记录</span></div>
+              <div class="tab">⚙<span>设置</span></div>
+            </nav>
+            <div class="home-indicator c-home"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
