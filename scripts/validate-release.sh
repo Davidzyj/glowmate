@@ -23,6 +23,12 @@ if [[ "$style" != "Light" ]]; then
   exit 1
 fi
 
+photo_usage="$(plutil -extract NSPhotoLibraryAddUsageDescription raw "$PLIST")"
+if [[ -z "$photo_usage" ]]; then
+  echo "NSPhotoLibraryAddUsageDescription must be present for save-to-library"
+  exit 1
+fi
+
 family="$(plutil -extract UIDeviceFamily.0 raw "$PLIST")"
 if [[ "$family" != "1" ]]; then
   echo "UIDeviceFamily must be iPhone-only, got $family"
@@ -76,4 +82,3 @@ xcodebuild \
   build > "$LOG_DIR/release-build.log" 2>&1
 
 echo "Release validation passed."
-

@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import SwiftUI
 
@@ -15,6 +16,7 @@ final class GlowMateModel: ObservableObject {
     let screenshotMode: Bool
 
     private let persistence: PersistenceProviding
+    private var cancellables = Set<AnyCancellable>()
 
     var language: AppLanguage {
         selectedLanguage ?? AppLanguage.inferred()
@@ -53,6 +55,20 @@ final class GlowMateModel: ObservableObject {
             selectedLanguage = state.selectedLanguage ?? .english
         }
         #endif
+
+        camera.objectWillChange
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+
+        torch.objectWillChange
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
 
     func updateSample(_ sample: LightingSample) {
@@ -65,6 +81,26 @@ final class GlowMateModel: ObservableObject {
         selectedTab = .light
         showToast("meter.applied")
         save()
+    }
+
+    func takePhoto() {
+        #if DEBUG
+        if screenshotMode {
+            showToast("camera.demoSaved")
+            return
+        }
+        #endif
+
+        showToast("camera.saving")
+        camera.captureAndSave { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success:
+                self.showToast("camera.saved")
+            case .failure(let error):
+                self.showToast(self.toastKey(for: error))
+            }
+        }
     }
 
     func updateBrightness(_ brightness: Double) {
@@ -134,6 +170,17 @@ final class GlowMateModel: ObservableObject {
     private func save() {
         let state = PersistedState(selectedLanguage: selectedLanguage, configuration: configuration, records: records)
         persistence.save(state)
+    }
+
+    private func toastKey(for error: CameraMeter.PhotoCaptureError) -> String {
+        switch error {
+        case .cameraDenied:
+            return "camera.cameraDenied"
+        case .photosDenied:
+            return "camera.photosDenied"
+        case .cameraUnavailable, .captureUnavailable, .captureFailed, .photoDataUnavailable, .saveFailed:
+            return "camera.saveFailed"
+        }
     }
 
     private func showToast(_ key: String) {

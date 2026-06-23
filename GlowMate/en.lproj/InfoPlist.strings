@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "GlowMate";
 "NSCameraUsageDescription" = "GlowMate uses the camera preview to estimate lighting locally and recommend screen fill light settings.";
+"NSPhotoLibraryAddUsageDescription" = "GlowMate saves photos you take in the app to your photo library.";

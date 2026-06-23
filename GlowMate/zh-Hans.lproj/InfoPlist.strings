@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "柔光伴侣";
 "NSCameraUsageDescription" = "柔光伴侣会使用相机预览在本地估算光线，并推荐屏幕补光参数。";
+"NSPhotoLibraryAddUsageDescription" = "柔光伴侣会将你在 App 内拍摄的照片保存到照片图库。";

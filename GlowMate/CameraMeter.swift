@@ -1,5 +1,6 @@
 import AVFoundation
 import CoreImage
+import Photos
 import SwiftUI
 
 final class CameraMeter: NSObject, ObservableObject {
@@ -9,13 +10,26 @@ final class CameraMeter: NSObject, ObservableObject {
         case authorized
     }
 
+    enum PhotoCaptureError: Error {
+        case cameraDenied
+        case cameraUnavailable
+        case captureUnavailable
+        case captureFailed
+        case photoDataUnavailable
+        case photosDenied
+        case saveFailed
+    }
+
     @Published var permissionState: PermissionState = .unknown
     @Published var sample: LightingSample = .neutral
+    @Published var isCapturingPhoto = false
 
     let session = AVCaptureSession()
+    private let photoOutput = AVCapturePhotoOutput()
     private let sessionQueue = DispatchQueue(label: "GlowMate.camera.session")
     private let outputQueue = DispatchQueue(label: "GlowMate.camera.output")
     private var isConfigured = false
+    private var photoProcessors: [Int64: PhotoCaptureProcessor] = [:]
 
     override init() {
         super.init()
@@ -68,9 +82,55 @@ final class CameraMeter: NSObject, ObservableObject {
         }
     }
 
+    func captureAndSave(completion: @escaping (Result<Void, PhotoCaptureError>) -> Void) {
+        guard permissionState == .authorized else {
+            DispatchQueue.main.async {
+                completion(.failure(.cameraDenied))
+            }
+            return
+        }
+
+        guard !isCapturingPhoto else {
+            return
+        }
+
+        isCapturingPhoto = true
+
+        sessionQueue.async { [weak self] in
+            guard let self else { return }
+
+            if !self.isConfigured {
+                self.configureSession()
+            }
+
+            guard self.isConfigured else {
+                self.finishPhotoCapture(id: nil, result: .failure(.cameraUnavailable), completion: completion)
+                return
+            }
+
+            guard self.session.outputs.contains(self.photoOutput) else {
+                self.finishPhotoCapture(id: nil, result: .failure(.captureUnavailable), completion: completion)
+                return
+            }
+
+            if !self.session.isRunning {
+                self.session.startRunning()
+            }
+
+            let settings = AVCapturePhotoSettings()
+            settings.photoQualityPrioritization = .balanced
+
+            let processor = PhotoCaptureProcessor { [weak self] result in
+                self?.finishPhotoCapture(id: settings.uniqueID, result: result, completion: completion)
+            }
+            self.photoProcessors[settings.uniqueID] = processor
+            self.photoOutput.capturePhoto(with: settings, delegate: processor)
+        }
+    }
+
     private func configureSession() {
         session.beginConfiguration()
-        session.sessionPreset = .medium
+        session.sessionPreset = .photo
 
         guard
             let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front),
@@ -94,8 +154,71 @@ final class CameraMeter: NSObject, ObservableObject {
             session.addOutput(output)
         }
 
+        if session.canAddOutput(photoOutput) {
+            session.addOutput(photoOutput)
+            photoOutput.maxPhotoQualityPrioritization = .balanced
+        }
+
         session.commitConfiguration()
         isConfigured = true
+    }
+
+    private func finishPhotoCapture(
+        id: Int64?,
+        result: Result<Void, PhotoCaptureError>,
+        completion: @escaping (Result<Void, PhotoCaptureError>) -> Void
+    ) {
+        if let id {
+            sessionQueue.async { [weak self] in
+                self?.photoProcessors[id] = nil
+            }
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.isCapturingPhoto = false
+            completion(result)
+        }
+    }
+}
+
+private final class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate {
+    private let completion: (Result<Void, CameraMeter.PhotoCaptureError>) -> Void
+
+    init(completion: @escaping (Result<Void, CameraMeter.PhotoCaptureError>) -> Void) {
+        self.completion = completion
+        super.init()
+    }
+
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        if error != nil {
+            completion(.failure(.captureFailed))
+            return
+        }
+
+        guard let photoData = photo.fileDataRepresentation() else {
+            completion(.failure(.photoDataUnavailable))
+            return
+        }
+
+        PhotoLibraryWriter.savePhoto(data: photoData, completion: completion)
+    }
+}
+
+private enum PhotoLibraryWriter {
+    static func savePhoto(data: Data, completion: @escaping (Result<Void, CameraMeter.PhotoCaptureError>) -> Void) {
+        PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+            guard status == .authorized || status == .limited else {
+                completion(.failure(.photosDenied))
+                return
+            }
+
+            PHPhotoLibrary.shared().performChanges {
+                let request = PHAssetCreationRequest.forAsset()
+                request.addResource(with: .photo, data: data, options: nil)
+            } completionHandler: { success, _ in
+                completion(success ? .success(()) : .failure(.saveFailed))
+            }
+        }
     }
 }
 

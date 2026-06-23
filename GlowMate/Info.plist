@@ -26,6 +26,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>GlowMate uses the camera preview to estimate lighting locally and recommend screen fill light settings.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>GlowMate saves photos you take in the app to your photo library.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIDeviceFamily</key>

@@ -100,11 +100,27 @@ Acceptance:
 - Screenshot script uses explicit launch arguments.
 - Release validation confirms `ITSAppUsesNonExemptEncryption` is `false` and checks that screenshot mode is Debug-only.
 
+### Path 7: Take And Save A Photo
+
+1. User opens the Meter tab.
+2. If camera permission is granted, the live preview is visible and the Take & Save Photo action is enabled.
+3. User taps Take & Save Photo.
+4. The app captures a still photo from the local camera session and requests add-only photo library permission if needed.
+5. The app saves the photo to the system photo library and shows success or permission/error feedback.
+
+Acceptance:
+
+- The action is disabled until camera access is available.
+- Saving uses Photos add-only permission and does not upload or persist photo data inside the app.
+- Success, camera denial, photo-library denial, and save failure paths show localized feedback.
+- Screenshot demo mode does not access camera/photo library and only shows demo feedback in Debug.
+
 ## Stage 2 - Implementation Progress
 
 - Created native SwiftUI iPhone project.
 - Configured app name, bundle ID, version, iPhone-only device family, forced light mode, and export compliance plist key.
 - Implemented local persistence, language selection, camera-based metering, screen soft light, torch control, scenes, records, settings, and Debug-only screenshot mode.
+- Added photo capture and save-to-library flow from the Meter screen with localized camera and Photos permission messages.
 - Added generated app icon assets with 1024x1024 RGB icon and no alpha channel.
 - Added GitHub Pages-ready privacy and support pages in English, Simplified Chinese, and Japanese.
 - Added screenshot capture and release validation scripts.

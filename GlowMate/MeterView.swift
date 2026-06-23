@@ -66,14 +66,49 @@ struct MeterView: View {
                     .clipShape(Capsule())
                     .padding(14)
             }
-            .frame(height: 300)
+            .frame(height: 260)
             .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 30, style: .continuous)
                     .stroke(Color.white.opacity(0.7), lineWidth: 1)
             )
             .shadow(color: Theme.coral.opacity(0.16), radius: 22, x: 0, y: 14)
+
+            Button {
+                model.takePhoto()
+            } label: {
+                Label(
+                    model.camera.isCapturingPhoto ? model.localizer.text("camera.saving") : model.localizer.text("camera.takePhoto"),
+                    systemImage: model.camera.isCapturingPhoto ? "hourglass" : "camera.fill"
+                )
+                .font(.headline.weight(.heavy))
+                .foregroundStyle(canTakePhoto ? Color.white : Theme.muted)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .background(canTakePhoto ? Theme.primaryGradient : LinearGradient(colors: [Theme.cardSoft, Theme.cardSoft], startPoint: .leading, endPoint: .trailing))
+                .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 17, style: .continuous)
+                        .stroke(canTakePhoto ? Color.clear : Theme.line, lineWidth: 1)
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(!canTakePhoto)
+            .accessibilityIdentifier("meter.takePhoto")
+
+            if model.camera.permissionState != .authorized && !model.screenshotMode {
+                Text(model.localizer.text("camera.needCamera"))
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Theme.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
+    }
+
+    private var canTakePhoto: Bool {
+        if model.screenshotMode {
+            return true
+        }
+        return model.camera.permissionState == .authorized && !model.camera.isCapturingPhoto
     }
 
     private var permissionView: some View {
