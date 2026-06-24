@@ -118,16 +118,23 @@ print(f"{path}: {width}x{height} OK")
 PY
 }
 
-screens=(meter light scenes records settings)
+screens=(meter fill-camera light scenes records settings)
 
 for screen in "${screens[@]}"; do
   echo "Capturing $screen..."
   xcrun simctl terminate "$UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
-  launch_output="$(xcrun simctl launch "$UDID" "$BUNDLE_ID" --glowmate-screenshots --glowmate-screen "$screen")"
+  if [[ "$screen" == "fill-camera" ]]; then
+    launch_output="$(xcrun simctl launch "$UDID" "$BUNDLE_ID" --glowmate-screenshots --glowmate-screen meter --glowmate-fill-camera)"
+  else
+    launch_output="$(xcrun simctl launch "$UDID" "$BUNDLE_ID" --glowmate-screenshots --glowmate-screen "$screen")"
+  fi
   echo "$launch_output"
   if ! grep -qE '^[^:]+: [0-9]+' <<< "$launch_output"; then
     echo "Launch did not return a process id for $screen"
     exit 1
+  fi
+  if [[ "$screen" == "fill-camera" ]]; then
+    sleep 2
   fi
   output="$OUT_DIR/${screen}.png"
   captured=0

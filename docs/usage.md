@@ -8,9 +8,9 @@ Open GlowMate and use the Meter tab to check current lighting. The app estimates
 
 Tap Apply to move the recommendation into the Light tab. GlowMate saves the active settings locally and adds a local record.
 
-## Take And Save A Photo
+## Use Fill-Light Camera
 
-On the Meter tab, allow camera access, frame the shot in the live preview, then tap Take & Save Photo. The app asks for permission to add photos to your library if needed, saves the captured photo to the system Photos library, and shows a confirmation message.
+On the Meter tab, allow camera access and tap Fill-Light Camera. GlowMate opens a full-screen capture mode that uses the current recommendation's tone and brightness as screen fill light. Tap the shutter to save the photo to the system Photos library, then close the capture mode to return to Meter.
 
 ## Use Screen Soft Light
 

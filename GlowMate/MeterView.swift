@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct MeterView: View {
     @EnvironmentObject private var model: GlowMateModel
@@ -75,11 +76,11 @@ struct MeterView: View {
             .shadow(color: Theme.coral.opacity(0.16), radius: 22, x: 0, y: 14)
 
             Button {
-                model.takePhoto()
+                model.startFillLightCamera()
             } label: {
                 Label(
-                    model.camera.isCapturingPhoto ? model.localizer.text("camera.saving") : model.localizer.text("camera.takePhoto"),
-                    systemImage: model.camera.isCapturingPhoto ? "hourglass" : "camera.fill"
+                    model.localizer.text("camera.openMode"),
+                    systemImage: "sparkles"
                 )
                 .font(.headline.weight(.heavy))
                 .foregroundStyle(canTakePhoto ? Color.white : Theme.muted)
@@ -93,7 +94,7 @@ struct MeterView: View {
             }
             .buttonStyle(.plain)
             .disabled(!canTakePhoto)
-            .accessibilityIdentifier("meter.takePhoto")
+            .accessibilityIdentifier("meter.openFillLightCamera")
 
             if model.camera.permissionState != .authorized && !model.screenshotMode {
                 Text(model.localizer.text("camera.needCamera"))
@@ -190,5 +191,176 @@ struct MeterView: View {
             }
         }
         .glowCard()
+    }
+}
+
+struct FillLightCameraView: View {
+    @EnvironmentObject private var model: GlowMateModel
+    let configuration: LightConfiguration
+    @State private var originalBrightness: CGFloat = UIScreen.main.brightness
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            Theme.toneColor(configuration.tone)
+                .ignoresSafeArea()
+
+            VStack(spacing: 16) {
+                topBar
+                    .padding(.top, 14)
+
+                Spacer(minLength: 4)
+
+                cameraFrame
+
+                HStack(spacing: 10) {
+                    FillLightMetricPill(label: model.localizer.text("light.brightness"), value: model.localizer.percent(configuration.brightness))
+                    FillLightMetricPill(label: model.localizer.text("light.tone"), value: model.localizer.text(configuration.tone.titleKey))
+                }
+                .padding(.horizontal, 6)
+
+                Spacer(minLength: 6)
+
+                shutterButton
+                    .padding(.bottom, 18)
+            }
+            .padding(.horizontal, 18)
+
+            if let toastKey = model.toastKey {
+                ToastView(text: model.localizer.text(toastKey))
+                    .padding(.bottom, 140)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .accessibilityIdentifier("screen.fillLightCamera")
+        .animation(.spring(response: 0.32, dampingFraction: 0.86), value: model.toastKey)
+        .onAppear {
+            originalBrightness = UIScreen.main.brightness
+            UIScreen.main.brightness = CGFloat(configuration.brightness)
+            UIApplication.shared.isIdleTimerDisabled = true
+            if !model.screenshotMode {
+                model.camera.start()
+            }
+        }
+        .onDisappear {
+            UIScreen.main.brightness = originalBrightness
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+    }
+
+    private var topBar: some View {
+        HStack(spacing: 12) {
+            Button {
+                model.isFillLightCameraPresented = false
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.headline.weight(.heavy))
+                    .foregroundStyle(Theme.ink)
+                    .frame(width: 42, height: 42)
+                    .background(Theme.card.opacity(0.86))
+                    .clipShape(Circle())
+            }
+            .buttonStyle(.plain)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(model.localizer.text("camera.modeTitle"))
+                    .font(.headline.weight(.heavy))
+                    .foregroundStyle(Theme.ink)
+                Text(model.localizer.text("camera.recommendedLight"))
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Theme.secondary)
+            }
+
+            Spacer()
+        }
+    }
+
+    private var cameraFrame: some View {
+        GeometryReader { proxy in
+            let width = min(proxy.size.width * 0.72, 318)
+            let height = min(proxy.size.height, width * 1.18)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: 34, style: .continuous)
+                    .fill(Theme.card.opacity(0.36))
+                    .frame(width: width + 34, height: height + 34)
+                preview
+                    .frame(width: width, height: height)
+                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .stroke(Color.white.opacity(0.82), lineWidth: 3)
+                    )
+                    .shadow(color: Theme.ink.opacity(0.18), radius: 24, x: 0, y: 14)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 372)
+    }
+
+    @ViewBuilder
+    private var preview: some View {
+        if model.screenshotMode {
+            DemoCameraArtwork()
+        } else {
+            CameraPreview(session: model.camera.session)
+        }
+    }
+
+    private var shutterButton: some View {
+        Button {
+            model.takePhoto()
+        } label: {
+            VStack(spacing: 9) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.card)
+                        .frame(width: 70, height: 70)
+                    Circle()
+                        .stroke(Theme.ink.opacity(0.12), lineWidth: 1)
+                        .frame(width: 70, height: 70)
+                    Image(systemName: model.camera.isCapturingPhoto ? "hourglass" : "camera.fill")
+                        .font(.system(size: 26, weight: .heavy))
+                        .foregroundStyle(Theme.coral)
+                }
+                Text(model.camera.isCapturingPhoto ? model.localizer.text("camera.saving") : model.localizer.text("camera.takePhoto"))
+                    .font(.subheadline.weight(.heavy))
+                    .foregroundStyle(Theme.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+        }
+        .buttonStyle(.plain)
+        .disabled(!canCapture)
+        .opacity(canCapture ? 1.0 : 0.54)
+        .accessibilityIdentifier("fillLightCamera.shutter")
+    }
+
+    private var canCapture: Bool {
+        if model.screenshotMode {
+            return true
+        }
+        return model.camera.permissionState == .authorized && !model.camera.isCapturingPhoto
+    }
+}
+
+private struct FillLightMetricPill: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Text(label)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(Theme.secondary)
+            Text(value)
+                .font(.subheadline.weight(.heavy))
+                .foregroundStyle(Theme.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .frame(maxWidth: .infinity, minHeight: 54)
+        .background(Theme.card.opacity(0.78))
+        .clipShape(Capsule())
     }
 }

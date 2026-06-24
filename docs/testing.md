@@ -6,29 +6,33 @@
    - Expected: permission explanation appears; no crash.
 2. Grant camera permission.
    - Expected: camera preview appears; score and recommendation update.
-3. Tap Take & Save Photo on Meter and allow add-only photo library access.
-   - Expected: button shows saving state, photo is added to Photos, and success feedback appears.
-4. Deny photo library add access, then tap Take & Save Photo.
+3. Tap Fill-Light Camera on Meter.
+   - Expected: full-screen capture mode opens, uses the visible recommendation's tone/brightness, and keeps camera preview visible.
+4. Tap the shutter in Fill-Light Camera and allow add-only photo library access.
+   - Expected: shutter shows saving state, photo is added to Photos, and success feedback appears.
+5. Close Fill-Light Camera.
+   - Expected: app returns to Meter and the original screen brightness is restored.
+6. Deny photo library add access, then tap the Fill-Light Camera shutter.
    - Expected: app does not crash; localized permission feedback appears; no app-local photo copy is created.
-5. Deny camera access.
-   - Expected: Take & Save Photo is disabled and the page explains that camera access is needed.
-6. Tap Apply on Meter.
+7. Deny camera access.
+   - Expected: Fill-Light Camera is disabled and the page explains that camera access is needed.
+8. Tap Apply on Meter.
    - Expected: Light tab opens; selected brightness/color matches recommendation; feedback appears.
-7. Change Light slider and color.
+9. Change Light slider and color.
    - Expected: UI updates immediately; values persist after tab changes and app relaunch.
-8. Open full-screen soft light and close it.
+10. Open full-screen soft light and close it.
    - Expected: full-screen color fills display; close returns to Light; state remains.
-9. Select each scene.
+11. Select each scene.
    - Expected: scene checkmark moves; Light values update; history record is added.
-10. Select a history record.
+12. Select a history record.
    - Expected: active light state is restored; confirmation feedback appears.
-11. Change language to English, Simplified Chinese, and Japanese.
+13. Change language to English, Simplified Chinese, and Japanese.
    - Expected: visible labels change immediately and persist.
-12. Open Privacy Policy and Support rows.
+14. Open Privacy Policy and Support rows.
    - Expected: browser opens; Settings does not show raw URL or support email text.
-13. Run screenshot mode script.
-    - Expected: deterministic app screens, no camera alert, generated screenshots have expected dimensions.
-14. Run release validation script.
+15. Run screenshot mode script.
+    - Expected: deterministic app screens, including Fill-Light Camera, no camera/photo alert, generated screenshots have expected dimensions.
+16. Run release validation script.
     - Expected: Info.plist encryption key exists and is false; target uses the expected plist.
 
 ## App Store Review-Focused Checks

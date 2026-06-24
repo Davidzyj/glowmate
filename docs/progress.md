@@ -89,7 +89,7 @@ Acceptance:
 
 1. Screenshot script launches the app with explicit Debug-only screenshot arguments.
 2. App initializes deterministic demo readings and history.
-3. Screenshots are captured without camera permission prompts.
+3. Screenshots are captured without camera permission prompts, including the optional fill-light camera launch state.
 4. Normal launches do not initialize or display fake data.
 5. Release builds ignore screenshot demo arguments.
 
@@ -97,20 +97,24 @@ Acceptance:
 
 - Demo data code is compiled only in Debug.
 - Demo data is never persisted into production defaults.
-- Screenshot script uses explicit launch arguments.
+- Screenshot script uses explicit launch arguments, including `--glowmate-fill-camera` for the capture-mode screenshot.
 - Release validation confirms `ITSAppUsesNonExemptEncryption` is `false` and checks that screenshot mode is Debug-only.
 
-### Path 7: Take And Save A Photo
+### Path 7: Fill-Light Camera And Save A Photo
 
 1. User opens the Meter tab.
-2. If camera permission is granted, the live preview is visible and the Take & Save Photo action is enabled.
-3. User taps Take & Save Photo.
-4. The app captures a still photo from the local camera session and requests add-only photo library permission if needed.
-5. The app saves the photo to the system photo library and shows success or permission/error feedback.
+2. If camera permission is granted, the live preview is visible and the Fill-Light Camera action is enabled.
+3. User taps Fill-Light Camera.
+4. The app opens a full-screen capture mode using the current recommendation's tone and brightness as screen fill light.
+5. User taps the shutter.
+6. The app captures a still photo from the local camera session, requests add-only photo library permission if needed, and saves the photo to the system photo library.
+7. User closes capture mode and the original screen brightness is restored.
 
 Acceptance:
 
 - The action is disabled until camera access is available.
+- The capture mode uses the recommendation that was visible when the user entered it.
+- The screen brightness is restored after closing capture mode.
 - Saving uses Photos add-only permission and does not upload or persist photo data inside the app.
 - Success, camera denial, photo-library denial, and save failure paths show localized feedback.
 - Screenshot demo mode does not access camera/photo library and only shows demo feedback in Debug.
@@ -120,10 +124,10 @@ Acceptance:
 - Created native SwiftUI iPhone project.
 - Configured app name, bundle ID, version, iPhone-only device family, forced light mode, and export compliance plist key.
 - Implemented local persistence, language selection, camera-based metering, screen soft light, torch control, scenes, records, settings, and Debug-only screenshot mode.
-- Added photo capture and save-to-library flow from the Meter screen with localized camera and Photos permission messages.
+- Added fill-light camera capture mode with recommended screen light, photo save-to-library flow, and localized camera/Photos permission messages.
 - Added generated app icon assets with 1024x1024 RGB icon and no alpha channel.
 - Added GitHub Pages-ready privacy and support pages in English, Simplified Chinese, and Japanese.
-- Added screenshot capture and release validation scripts.
+- Added screenshot capture and release validation scripts, including a Debug-only fill-light camera screenshot path.
 
 ## Stage 3 - Verification
 

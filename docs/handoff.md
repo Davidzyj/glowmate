@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-Build a native iPhone-only SwiftUI app named GlowMate: an offline soft-light and lighting recommendation tool using local camera frames, photo capture/save, screen brightness/color, torch control, local records, and three localizations.
+Build a native iPhone-only SwiftUI app named GlowMate: an offline soft-light and lighting recommendation tool using local camera frames, fill-light camera capture/save, screen brightness/color, torch control, local records, and three localizations.
 
 ## Design Direction
 
@@ -18,7 +18,7 @@ Use `ui-concepts/index.html`, Concept B / Halo Pop, as the visual reference:
 - iPhone only.
 - No accounts, no backend, no active network requests.
 - Local persistence on device.
-- Photo capture saves only to the system Photos library after user action and add-only Photos permission.
+- Fill-Light Camera opens a full-screen capture mode using the current recommendation's screen tone/brightness, then saves only to the system Photos library after user shutter action and add-only Photos permission.
 - Supported languages: English, Simplified Chinese, Japanese.
 - Explicit in-app language selection; system/region inference only when the user has not chosen.
 - `CFBundleDisplayName` localized in English, Chinese, and Japanese.
@@ -42,6 +42,7 @@ Use `ui-concepts/index.html`, Concept B / Halo Pop, as the visual reference:
 ## Development Notes
 
 - Keep demo data separated from production paths.
+- Fill-Light Camera screenshot mode is Debug-only and requires explicit `--glowmate-fill-camera`.
 - For SwiftUI arrays/dictionaries, reassign the whole value after mutation when UI refresh matters.
 - Avoid system dynamic text colors on warm/light backgrounds unless the background is also dynamic. This app uses forced light mode and explicit dark text colors.
 - Do not add SDKs or networking dependencies unless the product scope changes.

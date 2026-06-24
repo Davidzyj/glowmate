@@ -21,6 +21,14 @@ enum ScreenshotMode {
         return .meter
     }
 
+    static var shouldOpenFillLightCamera: Bool {
+        #if DEBUG
+        return ProcessInfo.processInfo.arguments.contains("--glowmate-fill-camera")
+        #else
+        return false
+        #endif
+    }
+
     #if DEBUG
     static var demoState: PersistedState {
         let records = [

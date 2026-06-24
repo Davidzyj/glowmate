@@ -10,6 +10,8 @@ final class GlowMateModel: ObservableObject {
     @Published var recommendation: LightRecommendation
     @Published var toastKey: String?
     @Published var isSoftLightPresented = false
+    @Published var isFillLightCameraPresented = false
+    @Published var fillLightCameraConfiguration: LightConfiguration?
 
     let camera = CameraMeter()
     let torch = TorchController()
@@ -53,6 +55,10 @@ final class GlowMateModel: ObservableObject {
         #if DEBUG
         if isScreenshot {
             selectedLanguage = state.selectedLanguage ?? .english
+            if ScreenshotMode.shouldOpenFillLightCamera {
+                fillLightCameraConfiguration = recommendation.configuration
+                isFillLightCameraPresented = true
+            }
         }
         #endif
 
@@ -81,6 +87,24 @@ final class GlowMateModel: ObservableObject {
         selectedTab = .light
         showToast("meter.applied")
         save()
+    }
+
+    func startFillLightCamera() {
+        #if DEBUG
+        if screenshotMode {
+            fillLightCameraConfiguration = recommendation.configuration
+            isFillLightCameraPresented = true
+            return
+        }
+        #endif
+
+        guard camera.permissionState == .authorized else {
+            showToast("camera.cameraDenied")
+            return
+        }
+
+        fillLightCameraConfiguration = recommendation.configuration
+        isFillLightCameraPresented = true
     }
 
     func takePhoto() {

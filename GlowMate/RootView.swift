@@ -26,6 +26,10 @@ struct RootView: View {
             SoftLightFullScreenView(configuration: model.configuration)
                 .environmentObject(model)
         }
+        .fullScreenCover(isPresented: $model.isFillLightCameraPresented) {
+            FillLightCameraView(configuration: model.fillLightCameraConfiguration ?? model.recommendation.configuration)
+                .environmentObject(model)
+        }
     }
 
     @ViewBuilder
